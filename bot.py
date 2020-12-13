@@ -7,9 +7,9 @@ import xlrd
 from datetime import datetime
 import time
 import xlwt
-#from xlutils.copy import copy
+from xlutils.copy import copy
 import pandas as pd
-#import xlsxwriter
+import xlsxwriter
 
 def check_exists_by_xpath(xpath):
     try:
@@ -21,9 +21,7 @@ def check_exists_by_xpath(xpath):
 
 
 if __name__ == "__main__":
-
-
-   
+ 
     start_time=time.time()
     email_login = input("email : ")
     pw = input("password : ")
@@ -66,9 +64,7 @@ if __name__ == "__main__":
 
     while(sheet.cell_value(i,4) != "" ):
         i +=1
-        if(sheet.cell_value(i,12)== "LIVRE" and str(type(sheet.cell_value(i,4))) == "<class 'str'>"):
-            print(sheet.cell_value (i,4))
-            print(type(sheet.cell_value (i,4)))
+        if(sheet.cell_value(i,4) != "" and sheet.cell_value(i,12)== "LIVRE"):
             tempsns = int(sheet.cell_value (i,4))
             str1 = str(tempsns)
             if(len(str1) != 9 or str1[0] == '0'):
@@ -81,8 +77,8 @@ if __name__ == "__main__":
                 web.find_element_by_id("PatientNumber").send_keys(str1)
                 web.find_element_by_id("filterSearch").click()
                 time.sleep(1.5)
-                while check_exists_by_xpath("//td[@class='table-results waitMe_container']")==True:  
-                    time.sleep(0.5)
+                while check_exists_by_xpath("//td[@class='table-results waitMe_container']")==True:
+                    time.sleep(0.5)  
                 if check_exists_by_xpath("//td[@class='dataTables_empty']")==True:
                     inserir +=1
                     with open('textfile.txt', 'a') as g:
@@ -90,16 +86,32 @@ if __name__ == "__main__":
                     continue
                 if check_exists_by_xpath("//table[@id='tablePerson']//td[contains(text(), 'Curado')]")==True:
                     curados+=1
+                    x = web.find_element_by_xpath("//table[@id='tablePerson']//td[9]").text
+                    print(x);
                     with open('textfile.txt', 'a') as g:
-                        g.write('Curado %s\n' %(str1))
+                        g.write('Curado: %s' %(str1) + " " +'; Telefone: '+(x) + '\n')
                     continue
                 if check_exists_by_xpath("//table[@id='tablePerson']//td[contains(text(), 'Vigilância Sobreativa (MGF)')]")==True and check_exists_by_xpath("//table[@id='tablePerson']//td[contains(text(), 'Positivo')]")==True :
                     sobreativo +=1
                 else:
                     action +=1
-                    with open('textfile.txt', 'a') as g:
-                        g.write('É preciso acao humana %s\n' %(str1))
+                    x = web.find_element_by_xpath("//table[@id='tablePerson']//td[9]").text
+                    print(x);
+                    with open('textfile.txt', 'a') as g: 
+                        g.write('É preciso acao humana: %s' %(str1) + " " +'; Telefone: '+(x) + '\n')
                     continue
+
+   
+    df = pd.read_excel('dados.xlsx', sheet_name='Data')
+    df.loc[0,'Número total']= int(df.loc[0,'Número total'])+ sobreativo
+    df.loc[1,'Número total']= int(df.loc[1,'Número total'])+ curados
+    df.loc[2,'Número total']= int(df.loc[2,'Número total'])+ sns_errado
+    df.loc[3,'Número total']= int(df.loc[3,'Número total'])+ action
+    df.loc[4,'Número total']= int(df.loc[4,'Número total'])+ inserir
+
+    writer = pd.ExcelWriter('dados.xlsx', engine='xlsxwriter')
+    df.to_excel(writer, sheet_name='Data')
+    writer.save()
 
 
 
