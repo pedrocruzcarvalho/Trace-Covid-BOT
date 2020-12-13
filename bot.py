@@ -87,7 +87,6 @@ if __name__ == "__main__":
                 if check_exists_by_xpath("//table[@id='tablePerson']//td[contains(text(), 'Curado')]")==True:
                     curados+=1
                     x = web.find_element_by_xpath("//table[@id='tablePerson']//td[9]").text
-                    print(x);
                     with open('textfile.txt', 'a') as g:
                         g.write('Curado: %s' %(str1) + " " +'; Telefone: '+(x) + '\n')
                     continue
@@ -96,7 +95,6 @@ if __name__ == "__main__":
                 else:
                     action +=1
                     x = web.find_element_by_xpath("//table[@id='tablePerson']//td[9]").text
-                    print(x);
                     with open('textfile.txt', 'a') as g: 
                         g.write('É preciso acao humana: %s' %(str1) + " " +'; Telefone: '+(x) + '\n')
                     continue
