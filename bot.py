@@ -2,7 +2,11 @@ import selenium
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
+from webbot import Browser
 import time
+import pyperclip
+import pyautogui
+import PIL
 import xlrd
 from datetime import datetime
 import time
@@ -21,13 +25,15 @@ def check_exists_by_xpath(xpath):
 
 
 if __name__ == "__main__":
- 
+
+
+   
     start_time=time.time()
     email_login = input("email : ")
     pw = input("password : ")
     i2 = input("ID de inicio: ")
     i = int(i2)
-    web=selenium.webdriver.Chrome('chromedriver.exe')
+    web=selenium.webdriver.Chrome(r"C:\Users\ARSNorte\Desktop\Trace Covid\chromedriver.exe")
 
    
     #Entrar no site
@@ -35,13 +41,13 @@ if __name__ == "__main__":
     time.sleep(0.5)
     web.get('https://tracecovid19.min-saude.pt/')
     web.find_element_by_link_text('Entrar').click()
-    time.sleep(3)
+    time.sleep(7)
     web.find_element_by_id("i0116").send_keys(email_login)
     web.find_element_by_id("i0116").send_keys(Keys.ENTER)
-    time.sleep(3)                                        
+    time.sleep(7)                                        
     web.find_element_by_id("i0118").send_keys(pw)
     web.find_element_by_id("i0118").send_keys(Keys.ENTER)
-    time.sleep(3)
+    time.sleep(7)
     web.switch_to.active_element.send_keys(Keys.ENTER)
     time.sleep(2)
     web.find_element_by_link_text('Trace Covid-19').click()
@@ -77,8 +83,8 @@ if __name__ == "__main__":
                 web.find_element_by_id("PatientNumber").send_keys(str1)
                 web.find_element_by_id("filterSearch").click()
                 time.sleep(1.5)
-                while check_exists_by_xpath("//td[@class='table-results waitMe_container']")==True:
-                    time.sleep(0.5)  
+                while check_exists_by_xpath("//td[@class='table-results waitMe_container']")==True:  
+                    time.sleep(0.5)
                 if check_exists_by_xpath("//td[@class='dataTables_empty']")==True:
                     inserir +=1
                     with open('textfile.txt', 'a') as g:
@@ -86,17 +92,15 @@ if __name__ == "__main__":
                     continue
                 if check_exists_by_xpath("//table[@id='tablePerson']//td[contains(text(), 'Curado')]")==True:
                     curados+=1
-                    x = web.find_element_by_xpath("//table[@id='tablePerson']//td[9]").text
                     with open('textfile.txt', 'a') as g:
-                        g.write('Curado: %s' %(str1) + " " +'; Telefone: '+(x) + '\n')
+                        g.write('Curado %s\n' %(str1))
                     continue
                 if check_exists_by_xpath("//table[@id='tablePerson']//td[contains(text(), 'Vigilância Sobreativa (MGF)')]")==True and check_exists_by_xpath("//table[@id='tablePerson']//td[contains(text(), 'Positivo')]")==True :
                     sobreativo +=1
                 else:
                     action +=1
-                    x = web.find_element_by_xpath("//table[@id='tablePerson']//td[9]").text
-                    with open('textfile.txt', 'a') as g: 
-                        g.write('É preciso acao humana: %s' %(str1) + " " +'; Telefone: '+(x) + '\n')
+                    with open('textfile.txt', 'a') as g:
+                        g.write('É preciso acao humana %s\n' %(str1))
                     continue
 
    
@@ -114,3 +118,5 @@ if __name__ == "__main__":
 
 
     print("demorou " + str(time.time()-start_time) + " segundos")
+
+                
